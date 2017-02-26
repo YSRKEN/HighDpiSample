@@ -3,6 +3,9 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		Title="高DPI対応テスト" Height="300" Width="400">
 	<DockPanel>
+		<DockPanel.LayoutTransform>
+			<ScaleTransform ScaleX="{Binding ScaleX}" ScaleY="{Binding ScaleY}"/>
+		</DockPanel.LayoutTransform>
 		<TextBlock DockPanel.Dock="Top" Margin="0,10,0,10" Text="高DPI対応テスト" VerticalAlignment="Top" FontSize="48" HorizontalAlignment="Center"/>
 		<TextBox DockPanel.Dock="Bottom" Text="ここに結果が表示されます。" Height="100" Margin="10,0,10,10" HorizontalAlignment="Stretch" FontSize="22" />
 		<Button  DockPanel.Dock="Bottom" Content="ボタンをクリック" HorizontalAlignment="Center" Margin="0,10,0,10" VerticalAlignment="Top" Width="160" Height="40" FontSize="24" />
