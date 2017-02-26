@@ -38,6 +38,10 @@ namespace WpfApplication {
 		// 初期化直後の処理
 		protected override void OnSourceInitialized(EventArgs e) {
 			base.OnSourceInitialized(e);
+			// ウィンドウメッセージを取得する
+			var helper = new WindowInteropHelper(this);
+			var source = HwndSource.FromHwnd(helper.Handle);
+			source.AddHook(new HwndSourceHook(WndProc));
 			// 最初にDPIを取得する
 			ResizeWindowByDpi(GetDpi());
 		}
@@ -76,6 +80,17 @@ namespace WpfApplication {
 			NativeMethods.GetDpiForMonitor(hmonitor, MonitorDpiType.Default, ref dpiX, ref dpiY);
 			return new Dpi(dpiX, dpiY);
 		}
+		// WM_DPICHANGEDを取得するためのウィンドウプロシージャ
+		IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled) {
+			if(msg == (int)WindowMessage.DpiChanged) {
+				// wParamの下位16bit・上位16bitがそれぞれX・Y方向のDPIを表している
+				var dpiX = (uint)wParam & 0xFFFF;	//下位16bit
+				var dpiY = (uint)wParam >> 16;		//上位16bit
+				ResizeWindowByDpi(new Dpi(dpiX, dpiY));
+				handled = true;
+			}
+			return IntPtr.Zero;
+		}
 		// ウィンドウ内部にあるオブジェクトのスケールを管理する
 		class MainWindowDC : INotifyPropertyChanged {
 			// 横方向のスケール
@@ -113,5 +128,7 @@ namespace WpfApplication {
 		public enum MonitorDefaultTo { Null, Primary, Nearest }
 		// GetDpiForMonitorが返したDPIの種類
 		enum MonitorDpiType { Effective, Angular, Raw, Default = Effective }
+		// DPI変更時に飛んでくるウィンドウメッセージ
+		enum WindowMessage { DpiChanged = 0x02E0 }
 	}
 }
